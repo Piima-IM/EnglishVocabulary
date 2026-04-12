@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leaderboard</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    
+    body { 
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      
+      background-color: #0a0f1e; 
+      color: #f8fafc; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+      min-height: 100vh; 
+      margin: 0;
+      padding: 10px;
+      overflow-x: hidden; 
+    }
+
+    
+    .container { 
+      width: 100%; 
+      max-width: 550px; 
+      background: #111827; 
+      padding: 25px; 
+      border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7), 0 0 15px rgba(56, 189, 248, 0.15); 
+      border: 1px solid #1f2937;
+      margin-top: 30px;
+      margin-bottom: auto; 
+      position: relative;
+    }
+
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 20px; right: 20px; height: 3px;
+      background: linear-gradient(90deg, #38bdf8, #10b981);
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    h1 { 
+      text-align: center; 
+      color: #38bdf8;
+      text-transform: uppercase; 
+      letter-spacing: 3px; 
+      font-size: 1.8rem; 
+      margin-top: 10px;
+      margin-bottom: 5px;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    h2 {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 1rem;
+      font-weight: normal;
+      margin-top: 0;
+      margin-bottom: 30px;
+      letter-spacing: 1px;
+    }
+
+    
+    .player-card { 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+      padding: 18px 20px; 
+      margin-bottom: 12px; 
+      border-radius: 14px; 
+      background: #1f2937; 
+      border: 1px solid #334155; 
+      transition: all 0.3s ease; 
+      position: relative;
+      overflow: hidden;
+    }
+
+    
+    .player-card:hover {
+      transform: translateX(5px) scale(1.01);
+      background: #27374d;
+      border-color: #475569;
+      box-shadow: -5px 5px 15px rgba(0,0,0,0.3);
+    }
+
+
+    .player-card.rank-1 { background: #3f2c00; border-color: #fbbf24; }
+    .player-card.rank-2 { background: #1f2937; border-color: #9ca3af; }
+    .player-card.rank-3 { background: #3f1d0b; border-color: #d97706; }
+
+
+    .rank-name-block { display: flex; align-items: center; gap: 15px; }
+    
+
+    .rank-display { 
+      font-size: 1.3rem; 
+      font-weight: 800; 
+      color: #64748b; 
+      min-width: 35px; 
+      text-align: center; 
+      display: flex; justify-content: center; align-items: center;
+    }
+    
+    
+    .rank-display.medal { font-size: 2rem; min-width: 40px; }
+
+    
+    .name-display { font-size: 1.1rem; font-weight: 600; color: #f1f5f9; }
+
+
+    .score-display { 
+      font-size: 1.6rem; 
+      color: #10b981;
+      font-weight: 800; 
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); 
+    }
+
+
+    .loading { text-align: center; color: #64748b; padding: 40px; font-style: italic; }
+
+
+    @media (max-width: 480px) {
+      .container { padding: 15px; border-radius: 15px; }
+      h1 { font-size: 1.4rem; }
+      .player-card { padding: 12px 15px; }
+      .name-display { font-size: 1rem; }
+      .score-display { font-size: 1.3rem; }
+      .rank-display { font-size: 1.1rem; min-width: 25px; }
+      .rank-display.medal { font-size: 1.6rem; min-width: 30px; }
+    }
+
+    
+    .footer {
+      text-align: center;
+      padding: 30px 10px;
+      color: #64748b; 
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+    
+    .footer a {
+      color: #993333; 
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .footer a:hover { color: white; text-shadow: 0 0 5px #38bdf8; }
+    
+    
+    .footer i { 
+      font-size: 11px; 
+      margin-left: 5px; 
+      color: #475569; 
+      transition: color 0.2s;
+    }
+    
+    .footer a:hover i { color: white; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🏆 Leaderboard</h1>
+    <h2 id="listTitle"></h2>
+
+    
+    <div id="leaderboardList" class="loading">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+  </div>
+
+  <footer class="footer">
+    Made by <a href="https://AbdurahmonovBehruz.github.io/Info">Behruz</a> 
+    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+  </footer>
+
+  <script type="module">
+       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+      apiKey: "AIzaSyBFKNH17HTqnIQk6HMDxBWmUCmiPwpf3D8",
+      authDomain: "namelist-1bf07.firebaseapp.com",
+      databaseURL: "https://namelist-1bf07-default-rtdb.europe-west1.firebasedatabase.app/",
+      projectId: "namelist-1bf07",
+      storageBucket: "namelist-1bf07.firebasestorage.app",
+      messagingSenderId: "325136855046",
+      appId: "1:325136855046:web:bac259ab885ca8381fd387"
+    };
+
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const playersRef = ref(db, 'players'); // Ссылка на ветку 'players'
+
+ onValue(playersRef, (snapshot) => {
+      const data = snapshot.val();
+      const listDiv = document.getElementById('leaderboardList');
+      listDiv.innerHTML = ''; 
+
+  if (!data) {
+        listDiv.innerHTML = '<div class="loading">List is currently empty.</div>';
+        return;
+      }
+
+   const playersArray = Object.keys(data).map(key => ({
+        id: key,
+        ...data[key]
+      }));
+
+   playersArray.sort((a, b) => b.score - a.score);
+
+    playersArray.forEach((player, index) => {
+    let rankContent = index + 1; // По умолчанию просто число (1, 2, 3...)
+        let cardClass = 'player-card'; // Базовый класс карточки
+        let rankClass = 'rank-display'; // Базовый класс ранга
+
+   if (index === 0) { 
+          rankContent = '🥇'; cardClass += ' rank-1'; rankClass += ' medal'; 
+        } else if (index === 1) { 
+          rankContent = '🥈'; cardClass += ' rank-2'; rankClass += ' medal'; 
+        } else if (index === 2) { 
+          rankContent = '🥉'; cardClass += ' rank-3'; rankClass += ' medal'; 
+        }
+
+   const cardRef = document.createElement('div');
+        cardRef.className = cardClass;
+        
+   cardRef.innerHTML = `
+          <div class="rank-name-block">
+            <span class="${rankClass}">${rankContent}</span>
+            <span class="name-display">${player.name}</span>
+          </div>
+          <span class="score-display">${player.score}</span>
+        `;
+        
+        // Добавляем готовую карточку на страницу
+        listDiv.appendChild(cardRef);
+      });
+    });
+  
+  
+  
+  const titleRef = ref(db, 'settings/title');
+onValue(titleRef, (snapshot) => {
+  const newTitle = snapshot.val();
+  if (newTitle) {
+    document.getElementById('listTitle').innerText = newTitle;
+  }
+});
+
+  </script>
+</body>
+</html>
+
